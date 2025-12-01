@@ -43,24 +43,46 @@ praxis/
 └── turbo.json
 ```
 
-## Getting Started
+## 🚀 Quick Start
 
-### Prerequisites
+Choose your adventure:
 
-- Node.js 18+
-- PostgreSQL 14+
-- Redis 7+
-
-### Installation
-
+### ⚡ Option 1: Automated Setup (5 minutes)
 ```bash
-npm install
+./scripts/auto-setup.sh
+npm run dev
 ```
 
-### Development
+### 🐳 Option 2: Docker Only (2 minutes)
+```bash
+./scripts/docker-setup.sh
+# Then follow steps in QUICKSTART.md
+```
+
+### 📖 Option 3: Manual Setup (15 minutes)
+See **[INSTALLATION_GUIDE.md](./INSTALLATION_GUIDE.md)** for detailed instructions.
+
+### 📋 Documentation
+- **[QUICKSTART.md](./QUICKSTART.md)** - Fast setup for impatient devs
+- **[INSTALLATION_GUIDE.md](./INSTALLATION_GUIDE.md)** - Complete step-by-step guide
+- **[SETUP.md](./SETUP.md)** - Project overview and architecture
+
+### 🔍 Verify Setup
+```bash
+./scripts/check-setup.sh
+```
+
+## Prerequisites
+
+- Node.js 18+
+- npm 10+
+- PostgreSQL 14+ (or Docker)
+- Redis 7+ (or Docker)
+
+## Development
 
 ```bash
-npm run dev
+npm run dev  # Starts all workspaces
 ```
 
 ## License

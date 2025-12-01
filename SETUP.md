@@ -1,6 +1,6 @@
 # Praxis Setup Guide
 
-## 🎉 Phase 2 Complete - Monorepo Scaffolding Done!
+##  Phase 2 Complete - Monorepo Scaffolding Done!
 
 The full project structure has been created with:
 - ✅ TurboRepo monorepo setup
@@ -10,7 +10,7 @@ The full project structure has been created with:
 - ✅ Complete Prisma schema with all models
 - ✅ All configuration files
 
-## 📦 Installation Steps
+##  Installation Steps
 
 ### 1. Install Dependencies
 
@@ -88,7 +88,7 @@ Or use TurboRepo (from root):
 npm run dev
 ```
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 praxis/
@@ -130,7 +130,7 @@ praxis/
 - **Backend API**: http://localhost:4000
 - **Prisma Studio**: http://localhost:5555
 
-## 🚀 Next Steps - Phase 3
+##  Next Steps - Phase 3
 
 Now we build the core backend services:
 
@@ -143,7 +143,7 @@ Now we build the core backend services:
 7. **Copy Trading Module** - Track & suggest trades
 8. **Contest Engine** - Virtual trading competitions
 
-## 📚 Key Technologies
+##  Key Technologies
 
 ### Backend
 - **Express** - Web framework
@@ -167,7 +167,7 @@ Now we build the core backend services:
 - **Data API** - User positions & trades
 - **Builder Program** - Gasless txns & attribution
 
-## 🛠️ Useful Commands
+##  Useful Commands
 
 ```bash
 # Build all packages
@@ -189,7 +189,7 @@ cd apps/backend && npm run prisma:migrate
 cd apps/backend && npm run prisma:generate
 ```
 
-## 📖 Documentation
+##  Documentation
 
 - [Polymarket Docs](https://docs.polymarket.com)
 - [Next.js Docs](https://nextjs.org/docs)
