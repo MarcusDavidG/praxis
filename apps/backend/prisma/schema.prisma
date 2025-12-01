@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  username      String   @unique
+  avatar        String?
+  bio           String?
+  country       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stats          UserStats?
+  positions      Position[]
+  tradeEvents    TradeEvent[]
+  following      Follow[]        @relation("UserFollowing")
+  followers      Follow[]        @relation("UserFollowers")
+  badges         UserBadge[]
+  contestEntries ContestEntry[]
+  feedEvents     FeedEvent[]
+  copyTrades     CopyTradeEvent[] @relation("CopyTrader")
+  copiedBy       CopyTradeEvent[] @relation("CopyFollower")
+
+  @@index([walletAddress])
+  @@index([username])
+  @@map("users")
+}
+
+model UserStats {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  totalPnL        Float    @default(0)
+  roi             Float    @default(0)
+  winRate         Float    @default(0)
+  accuracy        Float    @default(0)
+  avgPositionSize Float    @default(0)
+  tradingStreak   Int      @default(0)
+  totalTrades     Int      @default(0)
+  totalVolume     Float    @default(0)
+  activeMarkets   Int      @default(0)
+  lastUpdated     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([totalPnL])
+  @@index([roi])
+  @@index([winRate])
+  @@index([accuracy])
+  @@map("user_stats")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model Market {
+  id             String    @id @default(cuid())
+  conditionId    String    @unique
+  questionId     String
+  question       String
+  description    String?
+  category       String?
+  endDate        DateTime?
+  volume         Float     @default(0)
+  liquidity      Float     @default(0)
+  outcomeTokens  String[]
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  positions     Position[]
+  tradeEvents   TradeEvent[]
+  feedEvents    FeedEvent[]
+  contestTrades ContestTrade[]
+
+  @@index([conditionId])
+  @@index([questionId])
+  @@index([active])
+  @@index([category])
+  @@map("markets")
+}
+
+model Position {
+  id            String   @id @default(cuid())
+  userId        String
+  marketId      String
+  outcome       String
+  size          Float
+  avgPrice      Float
+  currentPrice  Float    @default(0)
+  unrealizedPnL Float    @default(0)
+  realizedPnL   Float    @default(0)
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([marketId])
+  @@index([status])
+  @@map("positions")
+}
+
+model TradeEvent {
+  id        String    @id @default(cuid())
+  userId    String
+  marketId  String
+  type      String
+  outcome   String
+  size      Float
+  price     Float
+  timestamp DateTime  @default(now())
+  txHash    String?
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market          Market           @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  copyTradeEvents CopyTradeEvent[]
+
+  @@index([userId])
+  @@index([marketId])
+  @@index([timestamp])
+  @@map("trade_events")
+}
+
+model FeedEvent {
+  id        String   @id @default(cuid())
+  type      String
+  userId    String
+  marketId  String?
+  data      Json
+  timestamp DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market Market? @relation(fields: [marketId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("feed_events")
+}
+
+model CopyTradeEvent {
+  id           String    @id @default(cuid())
+  followerId   String
+  traderId     String
+  tradeEventId String
+  status       String    @default("pending")
+  multiplier   Float     @default(1.0)
+  maxAmount    Float
+  createdAt    DateTime  @default(now())
+  executedAt   DateTime?
+
+  follower   User       @relation("CopyFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  trader     User       @relation("CopyTrader", fields: [traderId], references: [id], onDelete: Cascade)
+  tradeEvent TradeEvent @relation(fields: [tradeEventId], references: [id], onDelete: Cascade)
+
+  @@index([followerId])
+  @@index([traderId])
+  @@index([tradeEventId])
+  @@index([status])
+  @@map("copy_trade_events")
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  iconUrl     String?
+  criteria    Json
+  createdAt   DateTime @default(now())
+
+  userBadges UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+  @@map("user_badges")
+}
+
+model LeaderboardCache {
+  id        String   @id @default(cuid())
+  period    String
+  metric    String
+  rank      Int
+  userId    String
+  value     Float
+  updatedAt DateTime @default(now())
+
+  @@unique([period, metric, userId])
+  @@index([period, metric, rank])
+  @@map("leaderboard_cache")
+}
+
+model Contest {
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  startDate      DateTime
+  endDate        DateTime
+  initialBalance Float    @default(10000)
+  status         String   @default("upcoming")
+  createdAt      DateTime @default(now())
+
+  entries ContestEntry[]
+
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("contests")
+}
+
+model ContestEntry {
+  id             String   @id @default(cuid())
+  contestId      String
+  userId         String
+  virtualBalance Float
+  currentValue   Float
+  pnl            Float    @default(0)
+  rank           Int?
+  joinedAt       DateTime @default(now())
+
+  contest Contest        @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades  ContestTrade[]
+
+  @@unique([contestId, userId])
+  @@index([contestId])
+  @@index([userId])
+  @@index([contestId, rank])
+  @@map("contest_entries")
+}
+
+model ContestTrade {
+  id             String   @id @default(cuid())
+  contestEntryId String
+  marketId       String
+  type           String
+  outcome        String
+  size           Float
+  price          Float
+  timestamp      DateTime @default(now())
+
+  contestEntry ContestEntry @relation(fields: [contestEntryId], references: [id], onDelete: Cascade)
+  market       Market       @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@index([contestEntryId])
+  @@index([marketId])
+  @@index([timestamp])
+  @@map("contest_trades")
+}
