@@ -15,5 +15,6 @@ const connection = new Redis({
 export const marketSyncQueue = new Queue("market-sync", { connection });
 export const positionSyncQueue = new Queue("position-sync", { connection });
 export const analyticsSyncQueue = new Queue("analytics-sync", { connection });
+export const leaderboardQueue = new Queue("leaderboard-calc", { connection });
 
 logger.info("BullMQ queues initialized");

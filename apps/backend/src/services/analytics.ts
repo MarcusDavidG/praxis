@@ -1,4 +1,5 @@
 import { prisma } from "../db/prisma";
+import { FeedService } from "./feed";
 import logger from "../utils/logger";
 
 export class AnalyticsService {
@@ -101,6 +102,11 @@ export class AnalyticsService {
       });
 
       logger.info(`Stats updated for user ${userId}`);
+
+      // Check for streak achievement
+      if (tradingStreak > 0) {
+        await FeedService.onStreakAchieved(userId, tradingStreak);
+      }
       
       return {
         totalPnL,

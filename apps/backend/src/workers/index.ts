@@ -1,7 +1,13 @@
 import { marketSyncWorker } from "./marketSyncWorker";
 import { positionSyncWorker } from "./positionSyncWorker";
 import { analyticsWorker } from "./analyticsWorker";
-import { marketSyncQueue, positionSyncQueue, analyticsSyncQueue } from "./queue";
+import { leaderboardWorker } from "./leaderboardWorker";
+import {
+  marketSyncQueue,
+  positionSyncQueue,
+  analyticsSyncQueue,
+  leaderboardQueue,
+} from "./queue";
 import logger from "../utils/logger";
 
 // Start all workers
@@ -33,6 +39,18 @@ export function startWorkers() {
       jobId: "analytics-sync-10min",
     }
   );
+
+  // Calculate leaderboards every hour
+  leaderboardQueue.add(
+    "calculate-all-leaderboards",
+    {},
+    {
+      repeat: {
+        pattern: "0 * * * *", // Every hour
+      },
+      jobId: "leaderboard-calc-hourly",
+    }
+  );
   
   logger.info("Workers started and jobs scheduled");
 }
@@ -44,6 +62,7 @@ export async function stopWorkers() {
   await marketSyncWorker.close();
   await positionSyncWorker.close();
   await analyticsWorker.close();
+  await leaderboardWorker.close();
   
   logger.info("Workers stopped");
 }
@@ -53,7 +72,9 @@ export {
   marketSyncWorker,
   positionSyncWorker,
   analyticsWorker,
+  leaderboardWorker,
   marketSyncQueue,
   positionSyncQueue,
   analyticsSyncQueue,
+  leaderboardQueue,
 };
