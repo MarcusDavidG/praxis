@@ -66,7 +66,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <CardContent className="py-12 text-center">
               <h2 className="text-2xl font-bold mb-2">User Not Found</h2>
               <p className="text-slate-600 dark:text-slate-400">
-                This user doesn't exist.
+                This user doesn&apos;t exist.
               </p>
             </CardContent>
           </Card>

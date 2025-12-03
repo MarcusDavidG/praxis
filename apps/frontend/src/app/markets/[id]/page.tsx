@@ -43,7 +43,7 @@ export default function MarketDetailsPage({ params }: { params: Promise<{ id: st
             <CardContent className="py-12 text-center">
               <h2 className="text-2xl font-bold mb-2">Market Not Found</h2>
               <p className="text-slate-600 dark:text-slate-400">
-                This market doesn't exist or has been removed.
+                This market doesn&apos;t exist or has been removed.
               </p>
             </CardContent>
           </Card>

@@ -20,6 +20,7 @@ export function useAuth() {
       clearAuth();
       localStorage.removeItem("auth_token");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, isAuthenticated]);
 
   const handleAuth = async () => {
