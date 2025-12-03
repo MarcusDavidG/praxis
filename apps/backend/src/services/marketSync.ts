@@ -24,36 +24,53 @@ export class MarketSyncService {
 
       for (const market of markets) {
         try {
+          const conditionId = market.conditionId || market.condition_id;
+          
+          if (!conditionId) {
+            logger.warn("Market missing conditionId, skipping");
+            continue;
+          }
+
+          // Parse outcomes if it's a JSON string
+          let outcomeTokens: string[] = [];
+          if (market.outcomes) {
+            try {
+              outcomeTokens = typeof market.outcomes === "string" 
+                ? JSON.parse(market.outcomes)
+                : market.outcomes;
+            } catch (e) {
+              outcomeTokens = [];
+            }
+          }
+
           await prisma.market.upsert({
-            where: {
-              conditionId: market.condition_id || market.conditionId,
-            },
+            where: { conditionId },
             update: {
               question: market.question,
               description: market.description,
               category: market.category,
-              endDate: market.end_date_iso ? new Date(market.end_date_iso) : null,
-              volume: parseFloat(market.volume || "0"),
-              liquidity: parseFloat(market.liquidity || "0"),
+              endDate: market.endDateIso || market.endDate ? new Date(market.endDateIso || market.endDate) : null,
+              volume: market.volumeNum || parseFloat(market.volume || "0"),
+              liquidity: market.liquidityNum || parseFloat(market.liquidity || "0"),
               active: market.active !== false,
             },
             create: {
-              conditionId: market.condition_id || market.conditionId,
-              questionId: market.question_id || market.questionId || market.condition_id,
+              conditionId,
+              questionId: market.id || market.questionId || conditionId,
               question: market.question,
               description: market.description,
               category: market.category,
-              endDate: market.end_date_iso ? new Date(market.end_date_iso) : null,
-              volume: parseFloat(market.volume || "0"),
-              liquidity: parseFloat(market.liquidity || "0"),
-              outcomeTokens: market.outcome_tokens || market.tokens || [],
+              endDate: market.endDateIso || market.endDate ? new Date(market.endDateIso || market.endDate) : null,
+              volume: market.volumeNum || parseFloat(market.volume || "0"),
+              liquidity: market.liquidityNum || parseFloat(market.liquidity || "0"),
+              outcomeTokens,
               active: market.active !== false,
             },
           });
 
           synced++;
         } catch (error) {
-          logger.error(`Failed to sync market ${market.condition_id}:`, error);
+          logger.error(`Failed to sync market ${market.conditionId || market.condition_id}:`, error);
         }
       }
 
@@ -77,27 +94,39 @@ export class MarketSyncService {
         return false;
       }
 
+      // Parse outcomes if it's a JSON string
+      let outcomeTokens: string[] = [];
+      if (market.outcomes) {
+        try {
+          outcomeTokens = typeof market.outcomes === "string" 
+            ? JSON.parse(market.outcomes)
+            : market.outcomes;
+        } catch (e) {
+          outcomeTokens = [];
+        }
+      }
+
       await prisma.market.upsert({
         where: { conditionId },
         update: {
           question: market.question,
           description: market.description,
           category: market.category,
-          endDate: market.end_date_iso ? new Date(market.end_date_iso) : null,
-          volume: parseFloat(market.volume || "0"),
-          liquidity: parseFloat(market.liquidity || "0"),
+          endDate: market.endDateIso || market.endDate ? new Date(market.endDateIso || market.endDate) : null,
+          volume: market.volumeNum || parseFloat(market.volume || "0"),
+          liquidity: market.liquidityNum || parseFloat(market.liquidity || "0"),
           active: market.active !== false,
         },
         create: {
           conditionId,
-          questionId: market.question_id || market.questionId || conditionId,
+          questionId: market.id || market.questionId || conditionId,
           question: market.question,
           description: market.description,
           category: market.category,
-          endDate: market.end_date_iso ? new Date(market.end_date_iso) : null,
-          volume: parseFloat(market.volume || "0"),
-          liquidity: parseFloat(market.liquidity || "0"),
-          outcomeTokens: market.outcome_tokens || market.tokens || [],
+          endDate: market.endDateIso || market.endDate ? new Date(market.endDateIso || market.endDate) : null,
+          volume: market.volumeNum || parseFloat(market.volume || "0"),
+          liquidity: market.liquidityNum || parseFloat(market.liquidity || "0"),
+          outcomeTokens,
           active: market.active !== false,
         },
       });
