@@ -12,6 +12,11 @@ import logger from "../utils/logger";
 
 // Start all workers
 export function startWorkers() {
+  if (!marketSyncQueue || !positionSyncQueue || !analyticsSyncQueue || !leaderboardQueue) {
+    logger.warn("Cannot start workers - queues not initialized (Redis not configured)");
+    return;
+  }
+
   logger.info("Starting all BullMQ workers...");
   
   // Schedule recurring jobs
@@ -59,10 +64,10 @@ export function startWorkers() {
 export async function stopWorkers() {
   logger.info("Stopping workers...");
   
-  await marketSyncWorker.close();
-  await positionSyncWorker.close();
-  await analyticsWorker.close();
-  await leaderboardWorker.close();
+  if (marketSyncWorker) await marketSyncWorker.close();
+  if (positionSyncWorker) await positionSyncWorker.close();
+  if (analyticsWorker) await analyticsWorker.close();
+  if (leaderboardWorker) await leaderboardWorker.close();
   
   logger.info("Workers stopped");
 }
