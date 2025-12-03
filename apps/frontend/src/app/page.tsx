@@ -1,19 +1,22 @@
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-16">
-        {/* Header with Connect Button */}
-        <nav className="flex justify-between items-center mb-16">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg"></div>
-            <span className="text-2xl font-bold">Praxis</span>
-          </div>
-          <ConnectButton />
-        </nav>
 
         {/* Hero Section */}
         <div className="text-center space-y-6 mb-20">
