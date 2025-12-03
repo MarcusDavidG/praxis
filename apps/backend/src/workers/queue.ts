@@ -1,4 +1,4 @@
-import { Queue, Worker } from "bullmq";
+import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { config } from "../config";
 import logger from "../utils/logger";

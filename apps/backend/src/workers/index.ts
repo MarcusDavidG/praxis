@@ -1,6 +1,7 @@
 import { marketSyncWorker } from "./marketSyncWorker";
 import { positionSyncWorker } from "./positionSyncWorker";
-import { marketSyncQueue, positionSyncQueue } from "./queue";
+import { analyticsWorker } from "./analyticsWorker";
+import { marketSyncQueue, positionSyncQueue, analyticsSyncQueue } from "./queue";
 import logger from "../utils/logger";
 
 // Start all workers
@@ -20,6 +21,18 @@ export function startWorkers() {
       jobId: "market-sync-hourly",
     }
   );
+
+  // Update analytics every 10 minutes
+  analyticsSyncQueue.add(
+    "sync-all-analytics",
+    {},
+    {
+      repeat: {
+        pattern: "*/10 * * * *", // Every 10 minutes
+      },
+      jobId: "analytics-sync-10min",
+    }
+  );
   
   logger.info("Workers started and jobs scheduled");
 }
@@ -30,9 +43,17 @@ export async function stopWorkers() {
   
   await marketSyncWorker.close();
   await positionSyncWorker.close();
+  await analyticsWorker.close();
   
   logger.info("Workers stopped");
 }
 
 // Export workers and queues
-export { marketSyncWorker, positionSyncWorker, marketSyncQueue, positionSyncQueue };
+export {
+  marketSyncWorker,
+  positionSyncWorker,
+  analyticsWorker,
+  marketSyncQueue,
+  positionSyncQueue,
+  analyticsSyncQueue,
+};

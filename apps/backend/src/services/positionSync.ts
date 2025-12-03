@@ -1,5 +1,6 @@
 import { prisma } from "../db/prisma";
 import { polymarketService } from "./polymarket";
+import { AnalyticsService } from "./analytics";
 import logger from "../utils/logger";
 
 export class PositionSyncService {
@@ -83,6 +84,15 @@ export class PositionSyncService {
       }
 
       logger.info(`Synced ${synced} positions for ${walletAddress}`);
+
+      // Update analytics after syncing positions
+      try {
+        await AnalyticsService.calculateUserStats(user.id);
+        logger.info(`Analytics updated for ${walletAddress}`);
+      } catch (error) {
+        logger.error(`Failed to update analytics for ${walletAddress}:`, error);
+      }
+
       return synced;
     } catch (error) {
       logger.error(`Position sync failed for ${walletAddress}:`, error);
