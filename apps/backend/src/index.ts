@@ -6,6 +6,7 @@ import logger from "./utils/logger";
 import { errorHandler } from "./middlewares/errorHandler";
 import { prisma } from "./db/prisma";
 import redis from "./utils/redis";
+import { startWorkers, stopWorkers } from "./workers";
 
 const app = express();
 
@@ -32,6 +33,9 @@ const startServer = async () => {
     await redis.ping();
     logger.info("Redis connected");
 
+    // Start BullMQ workers
+    startWorkers();
+
     app.listen(config.port, () => {
       logger.info(`Server running on port ${config.port}`);
       logger.info(`Environment: ${config.nodeEnv}`);
@@ -46,6 +50,7 @@ startServer();
 
 process.on("SIGINT", async () => {
   logger.info("Shutting down gracefully...");
+  await stopWorkers();
   await prisma.$disconnect();
   await redis.quit();
   process.exit(0);

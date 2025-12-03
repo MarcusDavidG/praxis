@@ -116,6 +116,7 @@ model Position {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   market Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, marketId, outcome])
   @@index([userId])
   @@index([marketId])
   @@index([status])
