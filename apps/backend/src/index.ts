@@ -18,7 +18,9 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// API routes will be added here
+// API routes
+import apiRouter from "./api";
+app.use("/api", apiRouter);
 
 app.use(errorHandler);
 
