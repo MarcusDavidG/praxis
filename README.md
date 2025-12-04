@@ -21,8 +21,8 @@ Praxis transforms prediction market trading into a social experience by providin
 - **Social Feed** - Stream of trading activity with filters for Global, Following, and Whale Trades
 - **Leaderboard System** - Rankings across 15 different timeframes and metrics
 - **Dashboard** - Personal statistics and portfolio overview
-- **Dark/Light Mode** - Complete theme support with system preference detection
-- **Responsive Design** - Mobile-optimized with hamburger menu navigation
+
+
 
 ### Backend Services
 - **40 REST API Endpoints** - Complete CRUD operations for all features
@@ -40,10 +40,10 @@ Praxis transforms prediction market trading into a social experience by providin
 - **Styling:** TailwindCSS with custom design system
 - **Web3:** RainbowKit + Wagmi for wallet connections
 - **State Management:** Zustand for global state
-- **Animations:** Framer Motion for smooth transitions
+
 - **UI Components:** Custom components with shadcn/ui base
-- **Theme:** next-themes for dark/light mode
-- **Icons:** Lucide React
+
+ 
 - **HTTP Client:** Axios with interceptors
 
 ### Backend
@@ -235,28 +235,6 @@ This starts:
 - Frontend at http://localhost:3000
 - Backend at http://localhost:4000
 
-## Deployment
-
-### Frontend (Vercel)
-
-The frontend is configured for automatic deployment:
-
-1. Connected to GitHub repository
-2. Auto-deploys on push to main branch
-3. Build command: `cd apps/frontend && npm run build`
-4. Output directory: `apps/frontend/.next`
-5. Environment variables configured in Vercel dashboard
-
-### Backend (Railway)
-
-The backend is configured for automatic deployment:
-
-1. Connected to GitHub repository
-2. Auto-deploys on push to main branch
-3. Build command: `cd apps/backend && npm run build`
-4. Start command: `cd apps/backend && npm start`
-5. Environment variables configured in Railway dashboard
-6. PostgreSQL database provisioned through Railway
 
 ### Background Workers
 
@@ -266,87 +244,9 @@ Background workers (market sync, analytics, leaderboards) are optional and requi
 - Can be enabled by adding Redis service to Railway
 - Workers will auto-start when Redis connection is detected
 
-## Demo Data Setup
 
-To populate the database with market data:
 
-```bash
-chmod +x scripts/demo-setup.sh
-./scripts/demo-setup.sh
-```
 
-This script:
-- Syncs 100 markets from Polymarket
-- Populates the database with real market data
-- Enables full application functionality
-
-## Available Scripts
-
-From the root directory:
-
-```bash
-npm run dev          # Start all development servers
-npm run build        # Build all packages
-npm run lint         # Lint all packages
-npm run clean        # Clean build artifacts
-```
-
-From apps/backend:
-
-```bash
-npm run dev          # Start backend in development mode
-npm run build        # Build for production
-npm start            # Start production server
-npx prisma studio    # Open Prisma Studio database GUI
-npx prisma generate  # Generate Prisma client
-npx prisma db push   # Push schema changes to database
-```
-
-From apps/frontend:
-
-```bash
-npm run dev          # Start Next.js dev server
-npm run build        # Build for production
-npm start            # Start production server
-npm run lint         # Run ESLint
-```
-
-## Known Limitations
-
-- Background workers currently disabled (no Redis in production)
-- Market and position data requires manual sync via API endpoints
-- Copy trading feature UI complete but backend functionality pending
-- Badge system designed but not yet implemented
-- Fantasy contests framework in place but not active
-
-## Future Enhancements
-
-- Redis integration for automated background jobs
-- Real-time WebSocket updates for live feed
-- Advanced copy trading with risk management
-- Badge and achievement system
-- Fantasy trading contests
-- Mobile native applications
-- Advanced analytics and charting
-- Multi-language support
-
-## Browser Support
-
-- Chrome/Edge (latest 2 versions)
-- Firefox (latest 2 versions)
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Security
-
-- Non-custodial design - no private keys stored
-- Signature-based authentication
-- JWT tokens with expiration
-- CORS configured for production domains
-- Input validation on all endpoints
-- SQL injection protection via Prisma
-- XSS protection via React
-- HTTPS enforced in production
 
 ## Contributing
 
