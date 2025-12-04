@@ -11,20 +11,51 @@ export function useAuth() {
   const { userId, setAuth, clearAuth, isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const hasAttemptedAuth = useRef(false);
+  const lastAttemptedAddress = useRef<string | null>(null);
+  const authInProgress = useRef(false);
 
-  // Auto-authenticate when wallet connects (only once)
+  // Auto-authenticate when wallet connects (once per address)
   useEffect(() => {
-    if (isConnected && address && !isAuthenticated && !hasAttemptedAuth.current) {
-      hasAttemptedAuth.current = true;
-      handleAuth();
-    } else if (!isConnected && isAuthenticated) {
-      hasAttemptedAuth.current = false;
-      clearAuth();
-      localStorage.removeItem("auth_token");
+    const attemptAuth = async () => {
+      // Guard conditions: only authenticate if ALL are true:
+      // 1. Wallet is connected
+      // 2. We have an address
+      // 3. Not already authenticated
+      // 4. Haven't already tried this address
+      // 5. No auth currently in progress
+      if (
+        isConnected &&
+        address &&
+        !isAuthenticated &&
+        lastAttemptedAddress.current !== address &&
+        !authInProgress.current
+      ) {
+        lastAttemptedAddress.current = address;
+        authInProgress.current = true;
+        
+        try {
+          await handleAuth();
+        } catch (error) {
+          console.error("Auto-auth failed:", error);
+        } finally {
+          authInProgress.current = false;
+        }
+      }
+    };
+
+    if (isConnected && address) {
+      attemptAuth();
+    } else if (!isConnected) {
+      // Reset when wallet disconnects
+      lastAttemptedAddress.current = null;
+      authInProgress.current = false;
+      if (isAuthenticated) {
+        clearAuth();
+        localStorage.removeItem("auth_token");
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address]);
+  }, [isConnected, address, isAuthenticated]);
 
   const handleAuth = async () => {
     if (!address) {
@@ -83,8 +114,15 @@ export function useAuth() {
       }
     } catch (err: any) {
       console.error("Auth error:", err);
-      setError(err.response?.data?.error || "Authentication failed");
-      return { success: false, error: err.message };
+      const errorMessage = err.response?.data?.error || err.message || "Authentication failed";
+      setError(errorMessage);
+      
+      // Don't retry automatically on user rejection or cancellation
+      if (err.message?.includes("User rejected") || err.message?.includes("User denied")) {
+        console.log("User rejected signature request");
+      }
+      
+      return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
     }
