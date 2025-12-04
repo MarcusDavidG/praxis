@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAccount, useSignMessage } from "wagmi";
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
@@ -11,17 +11,20 @@ export function useAuth() {
   const { userId, setAuth, clearAuth, isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasAttemptedAuth = useRef(false);
 
-  // Auto-authenticate when wallet connects
+  // Auto-authenticate when wallet connects (only once)
   useEffect(() => {
-    if (isConnected && address && !isAuthenticated) {
+    if (isConnected && address && !isAuthenticated && !hasAttemptedAuth.current) {
+      hasAttemptedAuth.current = true;
       handleAuth();
     } else if (!isConnected && isAuthenticated) {
+      hasAttemptedAuth.current = false;
       clearAuth();
       localStorage.removeItem("auth_token");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isAuthenticated]);
+  }, [isConnected, address]);
 
   const handleAuth = async () => {
     if (!address) {
