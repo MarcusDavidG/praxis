@@ -10,7 +10,7 @@ import { MobileMenu } from "./MobileMenu";
 
 export function Header() {
   const { isAuthenticated } = useAuth();
-  const { data: user } = useCurrentUser();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {

@@ -16,12 +16,17 @@ export function useUser(userId?: string) {
 }
 
 export function useCurrentUser() {
+  // Only fetch if we have an auth token
+  const hasToken = typeof window !== "undefined" ? !!localStorage.getItem("auth_token") : false;
+  
   return useQuery({
     queryKey: ["user", "me"],
     queryFn: async () => {
       const { data } = await api.get("/api/users/me");
       return data.data;
     },
+    enabled: hasToken,
+    retry: false, // Don't retry on 401
   });
 }
 
